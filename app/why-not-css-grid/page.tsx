@@ -138,7 +138,7 @@ export default function Page() {
 
       <footer className="mt-24 flex items-center justify-between border-t pt-4 text-sm text-muted-foreground">
         <span>
-          By <Link href="https://joohyun.dev">Joohyun Park</Link>
+          By <Link href="https://joohyunpark.com">Joohyun Park</Link>
         </span>
         <ThemeToggle />
       </footer>

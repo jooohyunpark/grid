@@ -15,7 +15,7 @@ const fontMono = Geist_Mono({
 const SITE_DESCRIPTION = "An opinionated grid system for React and Tailwind."
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://teul.joohyun.dev"),
+  metadataBase: new URL("https://teul.joohyunpark.com"),
   title: {
     default: "Teul",
     template: "%s — Teul",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Teul",
     description: SITE_DESCRIPTION,
-    url: "https://teul.joohyun.dev",
+    url: "https://teul.joohyunpark.com",
     siteName: "Teul",
     type: "website",
   },

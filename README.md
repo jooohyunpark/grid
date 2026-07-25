@@ -3,7 +3,7 @@
 An opinionated grid system for React and Tailwind.
 
 ```bash
-pnpm dlx shadcn@latest add https://teul.joohyun.dev/registry/teul.json
+pnpm dlx shadcn@latest add https://teul.joohyunpark.com/registry/teul.json
 ```
 
 ## Why Teul
@@ -14,7 +14,7 @@ Responsive layouts and Tailwind are everyday tools for building modern websites.
 - **Containers and items look identical.** A grid has two roles — the container and its items — but in Tailwind they're both just `<div>` with a class string.
 - **Tailwind's breakpoints stop at the component boundary.** Pair Tailwind with a responsive component from another library — MUI's `Grid`, for example — and you'll redeclare breakpoints in its theme. Two configs to keep in sync, plus another provider wrapping your app.
 
-Teul brings a 12-column grid system to Tailwind, built on flexbox: `Grid` for containers, `GridItem` for items. Type-safe responsive props, plain Tailwind under the hood, copy-paste install. No runtime, no dependencies, no config. ([Why flexbox and not CSS grid?](https://teul.joohyun.dev/why-not-css-grid))
+Teul brings a 12-column grid system to Tailwind, built on flexbox: `Grid` for containers, `GridItem` for items. Type-safe responsive props, plain Tailwind under the hood, copy-paste install. No runtime, no dependencies, no config. ([Why flexbox and not CSS grid?](https://teul.joohyunpark.com/why-not-css-grid))
 
 ## Prerequisites
 
@@ -66,10 +66,10 @@ import { Grid, GridItem } from "@/components/ui/teul"
 
 ### `<GridItem>`
 
-| Prop     | Type                            | Default | Notes                                              |
-| -------- | ------------------------------- | ------- | -------------------------------------------------- |
+| Prop     | Type                            | Default | Notes                                                    |
+| -------- | ------------------------------- | ------- | -------------------------------------------------------- |
 | `size`   | `ResponsiveValue<GridItemSize>` | `12`    | Columns to span (1–12). Use `0` to hide at a breakpoint. |
-| `offset` | `ResponsiveValue<GridItemSize>` | —       | Empty columns before the item                      |
+| `offset` | `ResponsiveValue<GridItemSize>` | —       | Empty columns before the item                            |
 
 For visual reordering, pass Tailwind's `order-*` utilities via `className` (e.g. `className="md:order-1"`).
 

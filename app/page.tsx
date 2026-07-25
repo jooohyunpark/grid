@@ -20,7 +20,7 @@ import { ThemeToggle } from "@/components/site/theme-toggle"
 import { Button } from "@/components/site/button"
 import Link from "next/link"
 
-const REGISTRY_URL = "https://teul.joohyun.dev/registry/teul.json"
+const REGISTRY_URL = "https://teul.joohyunpark.com/registry/teul.json"
 const INSTALL_COMMANDS = [
   { name: "pnpm", command: `pnpm dlx shadcn@latest add ${REGISTRY_URL}` },
   { name: "npm", command: `npx shadcn@latest add ${REGISTRY_URL}` },
@@ -406,7 +406,7 @@ type GridItemSize = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12`}
       <footer className="mt-24 flex items-center justify-between border-t pt-4 text-sm text-muted-foreground">
         <span>
           By{" "}
-          <Link href="https://joohyun.dev" className="hover:underline">
+          <Link href="https://joohyunpark.com" className="hover:underline">
             Joohyun Park
           </Link>
         </span>
