@@ -120,7 +120,7 @@ export default function Page() {
           that delivers all three.
         </p>
         <p>
-          Teul builds on <code>flex flex-wrap</code>. Each item declares its own
+          Grid builds on <code>flex flex-wrap</code>. Each item declares its own
           percentage width; items that don’t fit wrap to the next row, and the
           gaps wrap with them instead of sitting fixed in the container.
         </p>

@@ -15,22 +15,22 @@ const fontMono = Geist_Mono({
 const SITE_DESCRIPTION = "An opinionated grid system for React and Tailwind."
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://teul.joohyunpark.com"),
+  metadataBase: new URL("https://grid.joohyunpark.com"),
   title: {
-    default: "Teul",
-    template: "%s — Teul",
+    default: "Grid",
+    template: "%s — Grid",
   },
   description: SITE_DESCRIPTION,
   openGraph: {
-    title: "Teul",
+    title: "Grid",
     description: SITE_DESCRIPTION,
-    url: "https://teul.joohyunpark.com",
-    siteName: "Teul",
+    url: "https://grid.joohyunpark.com",
+    siteName: "Grid",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "Teul",
+    title: "Grid",
     description: SITE_DESCRIPTION,
   },
 }
@@ -55,7 +55,7 @@ export default function RootLayout({
         <ThemeProvider
           attribute="data-theme"
           defaultTheme="system"
-          storageKey="teul-theme"
+          storageKey="grid-theme"
           enableSystem
           disableTransitionOnChange
         >

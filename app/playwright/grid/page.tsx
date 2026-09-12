@@ -6,7 +6,7 @@ import {
   type GapScale,
   type GridItemSize,
   type ResponsiveValue,
-} from "@/components/ui/teul"
+} from "@/components/ui/grid"
 
 type ItemConfig = {
   size?: ResponsiveValue<GridItemSize>

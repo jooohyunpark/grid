@@ -1,4 +1,4 @@
-import { Grid, GridItem } from "@/components/ui/teul"
+import { Grid, GridItem } from "@/components/ui/grid"
 import { CodeBlock } from "@/components/site/code-block"
 import { CodePreview } from "@/components/site/code-preview"
 import { Block } from "@/components/site/block"
@@ -20,7 +20,7 @@ import { ThemeToggle } from "@/components/site/theme-toggle"
 import { Button } from "@/components/site/button"
 import Link from "next/link"
 
-const REGISTRY_URL = "https://teul.joohyunpark.com/registry/teul.json"
+const REGISTRY_URL = "https://grid.joohyunpark.com/registry/grid.json"
 const INSTALL_COMMANDS = [
   { name: "pnpm", command: `pnpm dlx shadcn@latest add ${REGISTRY_URL}` },
   { name: "npm", command: `npx shadcn@latest add ${REGISTRY_URL}` },
@@ -32,7 +32,7 @@ export default function Page() {
   return (
     <div>
       <Block>
-        <h1>Teul</h1>
+        <h1>Grid</h1>
         <p className="text-muted-foreground">
           An opinionated grid system for React and Tailwind
         </p>
@@ -41,7 +41,7 @@ export default function Page() {
           <Button
             variant="outline"
             size="sm"
-            render={<Link href="https://github.com/jooohyunpark/teul" />}
+            render={<Link href="https://github.com/jooohyunpark/grid" />}
             nativeButton={false}
           >
             GitHub
@@ -50,7 +50,7 @@ export default function Page() {
       </Block>
 
       <Block>
-        <h2>Why Teul</h2>
+        <h2>Why Grid</h2>
 
         <p>
           Responsive layouts and Tailwind are everyday tools for building modern
@@ -86,7 +86,7 @@ export default function Page() {
         </ul>
 
         <p>
-          Teul brings a 12-column grid system to Tailwind, built on flexbox:{" "}
+          Grid brings a 12-column grid system to Tailwind, built on flexbox:{" "}
           <code>Grid</code> for containers, <code>GridItem</code> for items.
           Type-safe responsive props, plain Tailwind under the hood, copy-paste
           install. No runtime, no dependencies, no config. (
@@ -103,7 +103,7 @@ export default function Page() {
       {/* Installation */}
       <Block>
         <h2>Installation</h2>
-        <p>Add Teul to your project via the shadcn CLI.</p>
+        <p>Add Grid to your project via the shadcn CLI.</p>
         <Tabs defaultValue="pnpm">
           <TabsList variant="line">
             {INSTALL_COMMANDS.map(({ name }) => (
@@ -120,7 +120,7 @@ export default function Page() {
         </Tabs>
         <p className="text-muted-foreground">Then import it:</p>
         <CodeBlock
-          code={`import { Grid, GridItem } from "@/components/ui/teul"`}
+          code={`import { Grid, GridItem } from "@/components/ui/grid"`}
           lang="tsx"
         />
       </Block>
@@ -229,7 +229,7 @@ export default function Page() {
       <Block>
         <h3>Reordering</h3>
         <p>
-          Teul leaves visual order to Tailwind’s <code>order-*</code> utilities.
+          Grid leaves visual order to Tailwind’s <code>order-*</code> utilities.
           Pass them via <code>className</code> — they take the same responsive
           prefixes (<code>sm:</code>, <code>md:</code>, &hellip;) as any other
           Tailwind class.

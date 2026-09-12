@@ -1,12 +1,12 @@
-# Teul
+# Grid
 
 An opinionated grid system for React and Tailwind.
 
 ```bash
-pnpm dlx shadcn@latest add https://teul.joohyunpark.com/registry/teul.json
+pnpm dlx shadcn@latest add https://grid.joohyunpark.com/registry/grid.json
 ```
 
-## Why Teul
+## Why Grid
 
 Responsive layouts and Tailwind are everyday tools for building modern websites. Combining them isn't — a few patterns keep getting in the way:
 
@@ -14,7 +14,7 @@ Responsive layouts and Tailwind are everyday tools for building modern websites.
 - **Containers and items look identical.** A grid has two roles — the container and its items — but in Tailwind they're both just `<div>` with a class string.
 - **Tailwind's breakpoints stop at the component boundary.** Pair Tailwind with a responsive component from another library — MUI's `Grid`, for example — and you'll redeclare breakpoints in its theme. Two configs to keep in sync, plus another provider wrapping your app.
 
-Teul brings a 12-column grid system to Tailwind, built on flexbox: `Grid` for containers, `GridItem` for items. Type-safe responsive props, plain Tailwind under the hood, copy-paste install. No runtime, no dependencies, no config. ([Why flexbox and not CSS grid?](https://teul.joohyunpark.com/why-not-css-grid))
+Grid brings a 12-column grid system to Tailwind, built on flexbox: `Grid` for containers, `GridItem` for items. Type-safe responsive props, plain Tailwind under the hood, copy-paste install. No runtime, no dependencies, no config. ([Why flexbox and not CSS grid?](https://grid.joohyunpark.com/why-not-css-grid))
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Teul brings a 12-column grid system to Tailwind, built on flexbox: `Grid` for co
 ## Usage
 
 ```tsx
-import { Grid, GridItem } from "@/components/ui/teul"
+import { Grid, GridItem } from "@/components/ui/grid"
 ```
 
 ### Basic

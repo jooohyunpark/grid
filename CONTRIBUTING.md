@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Teul.
+Thanks for helping improve Grid.
 
 ## Setup
 
