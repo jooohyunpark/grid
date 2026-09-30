@@ -54,34 +54,26 @@ export default function Page() {
 
         <p>
           Responsive layouts and Tailwind are everyday tools for building modern
-          websites. Combining them isn’t — a few patterns keep getting in the
-          way:
+          websites. Combining them isn’t — two patterns keep getting in the way:
         </p>
 
         <ul className="list-disc space-y-2 pl-6 text-muted-foreground">
           <li>
             <strong className="font-medium text-foreground">
-              Layout classes get buried in the utility string.
+              Layout gets lost in the class string.
             </strong>{" "}
-            Column widths, gaps, and alignment sit next to every other utility,
-            breakpoints multiply them, and offsets feel off-by-one — shifting
-            two columns in means writing <code>col-start-3</code>.
-          </li>
-          <li>
-            <strong className="font-medium text-foreground">
-              Containers and items look identical.
-            </strong>{" "}
-            A grid has two roles — the container and its items — but in Tailwind
-            they’re both just <code>{`<div>`}</code> with a class string.
+            Spans, gaps, and breakpoints sit alongside every other utility, and
+            a grid’s container and its columns are both just a{" "}
+            <code>{`<div>`}</code> with classes. You can’t see the layout at a
+            glance.
           </li>
           <li>
             <strong className="font-medium text-foreground">
               Tailwind’s breakpoints stop at the component boundary.
             </strong>{" "}
-            Pair Tailwind with a responsive component from another library —
-            MUI’s <code>Grid</code>, for example — and you’ll redeclare
-            breakpoints in its theme. Two configs to keep in sync, plus another
-            provider wrapping your app.
+            Reach for a library grid like MUI’s and you redeclare breakpoints in
+            its theme — two configs to keep in sync, and one more provider
+            wrapping your app.
           </li>
         </ul>
 

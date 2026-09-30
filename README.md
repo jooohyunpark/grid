@@ -8,11 +8,10 @@ pnpm dlx shadcn@latest add https://grid.joohyunpark.com/registry/grid.json
 
 ## Why Grid
 
-Responsive layouts and Tailwind are everyday tools for building modern websites. Combining them isn't — a few patterns keep getting in the way:
+Responsive layouts and Tailwind are everyday tools for building modern websites. Combining them isn't — two patterns keep getting in the way:
 
-- **Layout classes get buried in the utility string.** Column widths, gaps, and alignment sit next to every other utility, breakpoints multiply them, and offsets feel off-by-one — shifting two columns in means writing `col-start-3`.
-- **Containers and items look identical.** A grid has two roles — the container and its items — but in Tailwind they're both just `<div>` with a class string.
-- **Tailwind's breakpoints stop at the component boundary.** Pair Tailwind with a responsive component from another library — MUI's `Grid`, for example — and you'll redeclare breakpoints in its theme. Two configs to keep in sync, plus another provider wrapping your app.
+- **Layout gets lost in the class string.** Spans, gaps, and breakpoints sit alongside every other utility, and a grid's container and its columns are both just a `<div>` with classes. You can't see the layout at a glance.
+- **Tailwind's breakpoints stop at the component boundary.** Reach for a library grid like MUI's and you redeclare breakpoints in its theme — two configs to keep in sync, and one more provider wrapping your app.
 
 Grid brings a 12-column grid system to Tailwind, built on CSS grid: `Grid` for containers, `GridColumn` for columns. Type-safe responsive props, plain Tailwind under the hood, copy-paste install. No runtime, no dependencies, no config.
 
