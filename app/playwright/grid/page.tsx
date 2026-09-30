@@ -16,6 +16,7 @@ type ItemConfig = {
   start?: ResponsiveValue<GridStart>
   rowSpan?: ResponsiveValue<GridRowSpan>
   as?: GridElement
+  className?: string
   nested?: {
     gap?: ResponsiveValue<GapScale>
     rowGap?: ResponsiveValue<GapScale>
@@ -74,6 +75,7 @@ export default async function Page({
             start={item.start}
             rowSpan={item.rowSpan}
             as={item.as}
+            className={item.className}
             data-testid={`item-${i}`}
             style={item.nested ? undefined : { height: 40, background: "#888" }}
           >

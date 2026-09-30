@@ -7,6 +7,7 @@ type ItemConfig = {
   start?: ResponsiveNumber
   rowSpan?: ResponsiveNumber
   as?: string
+  className?: string
   nested?: {
     gap?: ResponsiveNumber
     rowGap?: ResponsiveNumber
@@ -279,6 +280,55 @@ test.describe("Row span", () => {
     // Inner items have no rowSpan: the third wraps to column 1, not column 7.
     const innerLeft = await leftOf(page, "item-0-0")
     expect((await leftOf(page, "item-0-2")) - innerLeft).toBeCloseTo(0, 0)
+  })
+})
+
+test.describe("Regressions", () => {
+  test("hiding at one breakpoint keeps the column's own display elsewhere", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1024, height: 800 })
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [{ span: { base: 0, md: 6 }, className: "flex" }],
+    })
+    const display = await page
+      .getByTestId("item-0")
+      .evaluate((el) => getComputedStyle(el).display)
+    expect(display).toBe("flex")
+  })
+
+  test("hiding is scoped to its own breakpoint range", async ({ page }) => {
+    await page.setViewportSize({ width: 800, height: 800 })
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [{ span: { base: 6, md: 0, xl: 6 } }],
+    })
+    expect(await page.getByTestId("item-0").boundingBox()).toBeNull()
+
+    await page.setViewportSize({ width: 1300, height: 800 })
+    expect(await widthOf(page, "item-0")).toBeCloseTo(W(6, 600, 32), 0)
+
+    await page.setViewportSize({ width: 600, height: 800 })
+    expect(await widthOf(page, "item-0")).toBeCloseTo(W(6, 600, 32), 0)
+  })
+
+  test("start + span past line 13 is clamped instead of adding columns", async ({
+    page,
+  }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [{ start: 4 }, { span: 1 }],
+    })
+    const containerLeft = await leftOf(page, "grid-container")
+    // Default span 12 from line 4 is clamped to 9, ending at the grid's edge.
+    expect((await leftOf(page, "item-0")) - containerLeft).toBeCloseTo(
+      START_PX(4, 600, 32),
+      0,
+    )
+    expect(await widthOf(page, "item-0")).toBeCloseTo(W(9, 600, 32), 0)
+    // No implicit tracks: a span=1 column keeps its 1/12 width.
+    expect(await widthOf(page, "item-1")).toBeCloseTo(W(1, 600, 32), 0)
   })
 })
 

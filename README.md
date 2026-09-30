@@ -20,7 +20,7 @@ Grid brings a 12-column grid system to Tailwind, built on CSS grid: `Grid` for c
 
 - React 19+
 - Tailwind CSS v4 (uses the `--spacing` theme token)
-- The [shadcn CLI](https://ui.shadcn.com/docs/cli)
+- A project set up with the [shadcn CLI](https://ui.shadcn.com/docs/cli) (`shadcn init` provides `cn` in `@/lib/utils`)
 
 ## Usage
 
@@ -69,12 +69,12 @@ import { Grid, GridColumn } from "@/components/ui/grid"
 
 ### `<GridColumn>`
 
-| Prop      | Type                           | Default | Notes                                                                       |
-| --------- | ------------------------------ | ------- | --------------------------------------------------------------------------- |
-| `span`    | `ResponsiveValue<GridSpan>`    | `12`    | Columns to span (1–12). Use `0` to hide at a breakpoint.                    |
-| `start`   | `ResponsiveValue<GridStart>`   | `auto`  | Column line the item starts on (1–12). Wraps to the next row if it's taken. |
-| `rowSpan` | `ResponsiveValue<GridRowSpan>` | `1`     | Rows to span (1–12)                                                         |
-| `as`      | `GridElement`                  | `"div"` | Element to render                                                           |
+| Prop      | Type                           | Default | Notes                                                                                                                                 |
+| --------- | ------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `span`    | `ResponsiveValue<GridSpan>`    | `12`    | Columns to span (1–12). Use `0` to hide at a breakpoint.                                                                              |
+| `start`   | `ResponsiveValue<GridStart>`   | `auto`  | Column line the column starts on (1–12). Wraps to the next row if it's taken; `span` is capped so it never runs past the last column. |
+| `rowSpan` | `ResponsiveValue<GridRowSpan>` | `1`     | Rows to span (1–12)                                                                                                                   |
+| `as`      | `GridElement`                  | `"div"` | Element to render                                                                                                                     |
 
 For visual reordering, pass Tailwind's `order-*` utilities via `className` (e.g. `className="md:order-1"`).
 

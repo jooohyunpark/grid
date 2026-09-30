@@ -248,9 +248,9 @@ export default function Page() {
         </CodePreview>
         <CodeBlock
           code={`<Grid gap={4}>
-  <GridColumn span={4} className="md:order-3">...</GridColumn>
-  <GridColumn span={4} className="md:order-1">...</GridColumn>
-  <GridColumn span={4} className="md:order-2">...</GridColumn>
+  <GridColumn span={{ base: 12, md: 4 }} className="md:order-3">...</GridColumn>
+  <GridColumn span={{ base: 12, md: 4 }} className="md:order-1">...</GridColumn>
+  <GridColumn span={{ base: 12, md: 4 }} className="md:order-2">...</GridColumn>
 </Grid>`}
         />
       </Block>
@@ -325,18 +325,19 @@ export default function Page() {
 
         <CodeBlock
           lang="ts"
-          code={`type Breakpoint  = "base" | "sm" | "md" | "lg" | "xl" | "2xl"
-type GapScale    = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12
-type GridSpan = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-type GridStart = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-type GridRowSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-type GridElement = "div" | "section"`}
+          code={`type Breakpoint         = "base" | "sm" | "md" | "lg" | "xl" | "2xl"
+type ResponsiveValue<T> = T | Partial<Record<Breakpoint, T>>
+type GapScale           = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12
+type GridSpan           = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+type GridStart          = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+type GridRowSpan        = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+type GridElement        = "div" | "section"`}
         />
 
         <p>
-          Every prop accepts a single value or a per-breakpoint object (e.g.{" "}
-          <code>{`{ md: 4, lg: 6 }`}</code>). <code>GapScale</code> follows
-          Tailwind’s spacing scale.
+          Every prop except <code>as</code> accepts a single value or a
+          per-breakpoint object (e.g. <code>{`{ md: 4, lg: 6 }`}</code>).{" "}
+          <code>GapScale</code> follows Tailwind’s spacing scale.
         </p>
 
         <h3>Grid</h3>
@@ -442,8 +443,9 @@ type GridElement = "div" | "section"`}
                   <code>auto</code>
                 </TableCell>
                 <TableCell>
-                  Column line the item starts on (1–12). Wraps to the next row
-                  if that column is taken.
+                  Column line the column starts on (1–12). Wraps to the next row
+                  if that column is taken; <code>span</code> is capped so it
+                  never runs past the last column.
                 </TableCell>
               </TableRow>
               <TableRow>

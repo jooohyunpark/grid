@@ -40,6 +40,9 @@ const DEFAULT_SPAN: GridSpan = 12
 const DEFAULT_ROW_GAP: GapScale = 12
 const DEFAULT_COL_GAP: GapScale = 8
 
+// Class strings are spelled out in full on purpose: Tailwind only generates
+// classes it finds as literal text, so building them in a loop would ship no CSS.
+//
 // Values ride on inline style as per-breakpoint vars (--grid-span-md, …); these
 // static classes fold them into the working var (--grid-span) at each
 // breakpoint. The working var is class-only — setting it inline would outrank
@@ -57,8 +60,8 @@ const COLUMN_CLASS =
   "[--grid-span:var(--grid-span-base)] sm:[--grid-span:var(--grid-span-sm)] md:[--grid-span:var(--grid-span-md)] lg:[--grid-span:var(--grid-span-lg)] xl:[--grid-span:var(--grid-span-xl)] 2xl:[--grid-span:var(--grid-span-2xl)] " +
   "[grid-column-end:span_var(--grid-span)]"
 
-// Only applied when start is set, so a nested item never picks up an outer
-// item's --grid-start. Longhands on purpose: the grid-column shorthand would
+// Only applied when start is set, so a nested column never picks up an outer
+// column's --grid-start. Longhands on purpose: the grid-column shorthand would
 // reset the edge the other class sets.
 const START_CLASS =
   "[--grid-start:var(--grid-start-base)] sm:[--grid-start:var(--grid-start-sm)] md:[--grid-start:var(--grid-start-md)] lg:[--grid-start:var(--grid-start-lg)] xl:[--grid-start:var(--grid-start-xl)] 2xl:[--grid-start:var(--grid-start-2xl)] " +
@@ -69,34 +72,44 @@ const ROW_SPAN_CLASS =
   "[--grid-row-span:var(--grid-row-span-base)] sm:[--grid-row-span:var(--grid-row-span-sm)] md:[--grid-row-span:var(--grid-row-span-md)] lg:[--grid-row-span:var(--grid-row-span-lg)] xl:[--grid-row-span:var(--grid-row-span-xl)] 2xl:[--grid-row-span:var(--grid-row-span-2xl)] " +
   "[grid-row-end:span_var(--grid-row-span)]"
 
-const DISPLAY_CLASS =
-  "[display:var(--grid-display-base)] sm:[display:var(--grid-display-sm)] md:[display:var(--grid-display-md)] lg:[display:var(--grid-display-lg)] xl:[display:var(--grid-display-xl)] 2xl:[display:var(--grid-display-2xl)]"
+// Hides only inside each flagged breakpoint's own range, so outside it the
+// column keeps whatever display its className gives it. One attribute per
+// breakpoint rather than a token list: Tailwind unquotes attribute values, and
+// an unquoted `2xl` is an invalid selector.
+const HIDE_CLASS =
+  "max-sm:data-hide-base:hidden sm:max-md:data-hide-sm:hidden md:max-lg:data-hide-md:hidden lg:max-xl:data-hide-lg:hidden xl:max-2xl:data-hide-xl:hidden 2xl:data-hide-2xl:hidden"
 
 function toRecord<T>(
   v: ResponsiveValue<T> | undefined,
 ): Partial<Record<Breakpoint, T>> {
-  if (v === undefined) return {}
-  if (typeof v === "object" && v !== null)
-    return v as Partial<Record<Breakpoint, T>>
-  return { base: v as T }
+  if (v == null) return {}
+  return typeof v === "object"
+    ? (v as Partial<Record<Breakpoint, T>>)
+    : { base: v }
+}
+
+// Fill in every breakpoint, carrying the last set value forward to mirror
+// Tailwind's mobile-first behavior.
+function resolve<T>(
+  value: ResponsiveValue<T> | undefined,
+  fallback: T,
+): Record<Breakpoint, T> {
+  const r = toRecord(value)
+  let current = fallback
+  const resolved = {} as Record<Breakpoint, T>
+  for (const bp of BREAKPOINTS) resolved[bp] = current = r[bp] ?? current
+  return resolved
 }
 
 // Emit every breakpoint, not just the ones set: custom properties inherit, so a
-// gap in the cascade would leak an ancestor grid's value into a nested one. The
-// last set value carries forward, mirroring Tailwind's mobile-first behavior.
+// gap in the cascade would leak an ancestor grid's value into a nested one.
 function responsiveVars<T>(
   prefix: string,
-  value: ResponsiveValue<T> | undefined,
-  fallback: T,
-  toCss: (v: T) => string | number,
+  resolved: Record<Breakpoint, T>,
+  toCss: (v: T) => string | number = (v) => v as string | number,
 ): React.CSSProperties {
-  const r = toRecord(value)
   const vars: Record<string, string | number> = {}
-  let current = fallback
-  for (const bp of BREAKPOINTS) {
-    current = r[bp] ?? current
-    vars[`${prefix}-${bp}`] = toCss(current)
-  }
+  for (const bp of BREAKPOINTS) vars[`${prefix}-${bp}`] = toCss(resolved[bp])
   return vars as React.CSSProperties
 }
 
@@ -128,14 +141,12 @@ function Grid({
       style={{
         ...responsiveVars(
           "--grid-row-gap",
-          gapVars(gap, rowGap),
-          DEFAULT_ROW_GAP,
+          resolve(gapVars(gap, rowGap), DEFAULT_ROW_GAP),
           gapValue,
         ),
         ...responsiveVars(
           "--grid-col-gap",
-          gapVars(gap, colGap),
-          DEFAULT_COL_GAP,
+          resolve(gapVars(gap, colGap), DEFAULT_COL_GAP),
           gapValue,
         ),
         ...style,
@@ -154,33 +165,38 @@ function GridColumn({
   style,
   ...props
 }: GridColumnProps) {
-  const hidesAnywhere = Object.values(toRecord(span)).includes(0)
+  const spans = resolve(span, DEFAULT_SPAN)
+  // Breakpoints before the first set start stay auto-placed.
+  const starts = start != null && resolve<GridStart | "auto">(start, "auto")
+  // A span running past line 13 would add implicit columns and resize every
+  // track, so cap it to the columns left after start.
+  const fitted = { ...spans }
+  if (starts)
+    for (const bp of BREAKPOINTS) {
+      const s = starts[bp]
+      if (s !== "auto") fitted[bp] = Math.min(spans[bp], 13 - s) as GridSpan
+    }
+  const hiddenAt = BREAKPOINTS.filter((bp) => spans[bp] === 0)
+  const hideAttrs = Object.fromEntries(
+    hiddenAt.map((bp) => [`data-hide-${bp}`, ""]),
+  )
+
   return (
     <Comp
       data-slot="grid-column"
+      {...hideAttrs}
       className={cn(
         COLUMN_CLASS,
-        start !== undefined && START_CLASS,
-        rowSpan !== undefined && ROW_SPAN_CLASS,
-        hidesAnywhere && DISPLAY_CLASS,
+        starts && START_CLASS,
+        rowSpan != null && ROW_SPAN_CLASS,
+        hiddenAt.length > 0 && HIDE_CLASS,
         className,
       )}
       style={{
-        ...responsiveVars("--grid-span", span, DEFAULT_SPAN, (v) => v),
-        // Breakpoints before the first set start stay auto-placed.
-        ...(start !== undefined &&
-          responsiveVars<GridStart | "auto">(
-            "--grid-start",
-            start,
-            "auto",
-            (v) => v,
-          )),
-        ...(rowSpan !== undefined &&
-          responsiveVars("--grid-row-span", rowSpan, 1, (v) => v)),
-        ...(hidesAnywhere &&
-          responsiveVars("--grid-display", span, DEFAULT_SPAN, (v) =>
-            v === 0 ? "none" : "block",
-          )),
+        ...responsiveVars("--grid-span", fitted),
+        ...(starts && responsiveVars("--grid-start", starts)),
+        ...(rowSpan != null &&
+          responsiveVars("--grid-row-span", resolve(rowSpan, 1))),
         ...style,
       }}
       {...(props as React.ComponentProps<"div">)}
