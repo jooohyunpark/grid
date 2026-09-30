@@ -1,5 +1,5 @@
 {
-  "name": "grid",
+  "name": "tailwind-grid",
   "version": "0.1.0",
   "description": "An opinionated grid system for React and Tailwind",
   "private": true,

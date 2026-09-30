@@ -2,15 +2,20 @@ import { notFound } from "next/navigation"
 
 import {
   Grid,
-  GridItem,
+  GridColumn,
   type GapScale,
-  type GridItemSize,
+  type GridSpan,
+  type GridStart,
+  type GridRowSpan,
+  type GridElement,
   type ResponsiveValue,
 } from "@/components/ui/grid"
 
 type ItemConfig = {
-  size?: ResponsiveValue<GridItemSize>
-  offset?: ResponsiveValue<GridItemSize>
+  span?: ResponsiveValue<GridSpan>
+  start?: ResponsiveValue<GridStart>
+  rowSpan?: ResponsiveValue<GridRowSpan>
+  as?: GridElement
   nested?: {
     gap?: ResponsiveValue<GapScale>
     rowGap?: ResponsiveValue<GapScale>
@@ -21,6 +26,7 @@ type ItemConfig = {
 
 type FixtureConfig = {
   containerWidth: number
+  as?: GridElement
   gap?: ResponsiveValue<GapScale>
   rowGap?: ResponsiveValue<GapScale>
   colGap?: ResponsiveValue<GapScale>
@@ -40,7 +46,7 @@ export default async function Page({
   }
 
   const config: FixtureConfig = JSON.parse(cfg)
-  const { containerWidth, gap, rowGap, colGap, items } = config
+  const { containerWidth, as, gap, rowGap, colGap, items } = config
 
   return (
     <div
@@ -54,12 +60,20 @@ export default async function Page({
         zIndex: 100,
       }}
     >
-      <Grid gap={gap} rowGap={rowGap} colGap={colGap} data-testid="grid">
+      <Grid
+        as={as}
+        gap={gap}
+        rowGap={rowGap}
+        colGap={colGap}
+        data-testid="grid"
+      >
         {items.map((item, i) => (
-          <GridItem
+          <GridColumn
             key={i}
-            size={item.size}
-            offset={item.offset}
+            span={item.span}
+            start={item.start}
+            rowSpan={item.rowSpan}
+            as={item.as}
             data-testid={`item-${i}`}
             style={item.nested ? undefined : { height: 40, background: "#888" }}
           >
@@ -71,17 +85,18 @@ export default async function Page({
                 data-testid={`item-${i}-grid`}
               >
                 {item.nested.items.map((inner, j) => (
-                  <GridItem
+                  <GridColumn
                     key={j}
-                    size={inner.size}
-                    offset={inner.offset}
+                    span={inner.span}
+                    start={inner.start}
+                    rowSpan={inner.rowSpan}
                     data-testid={`item-${i}-${j}`}
                     style={{ height: 40, background: "#666" }}
                   />
                 ))}
               </Grid>
             )}
-          </GridItem>
+          </GridColumn>
         ))}
       </Grid>
     </div>
