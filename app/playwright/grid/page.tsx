@@ -31,6 +31,7 @@ type FixtureConfig = {
   gap?: ResponsiveValue<GapScale>
   rowGap?: ResponsiveValue<GapScale>
   colGap?: ResponsiveValue<GapScale>
+  className?: string
   items: ItemConfig[]
 }
 
@@ -47,7 +48,7 @@ export default async function Page({
   }
 
   const config: FixtureConfig = JSON.parse(cfg)
-  const { containerWidth, as, gap, rowGap, colGap, items } = config
+  const { containerWidth, as, gap, rowGap, colGap, className, items } = config
 
   return (
     <div
@@ -66,6 +67,7 @@ export default async function Page({
         gap={gap}
         rowGap={rowGap}
         colGap={colGap}
+        className={className}
         data-testid="grid"
       >
         {items.map((item, i) => (

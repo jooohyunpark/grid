@@ -22,6 +22,7 @@ type FixtureConfig = {
   gap?: ResponsiveNumber
   rowGap?: ResponsiveNumber
   colGap?: ResponsiveNumber
+  className?: string
   items: ItemConfig[]
 }
 
@@ -511,5 +512,59 @@ test.describe("Responsive dedup", () => {
       items: [{ span: { base: 6, md: 4, lg: 6 } }],
     })
     expect(await widthOf(page, "item-0")).toBeCloseTo(W(6, 600, 32), 0)
+  })
+})
+
+test.describe("Props win over className", () => {
+  const rowGapPx = async (page: Page) =>
+    (await topOf(page, "item-1")) - (await topOf(page, "item-0")) - 40
+  const items = [{ span: 12 }, { span: 12 }, { span: 6 }, { span: 6 }]
+
+  test("gap-1 does not override rowGap", async ({ page }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      rowGap: 4,
+      className: "gap-1",
+      items,
+    })
+    expect(await rowGapPx(page)).toBeCloseTo(16, 0)
+  })
+
+  test("gap-y-1 / gap-x-1 do not override rowGap / colGap", async ({
+    page,
+  }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      rowGap: 4,
+      colGap: 4,
+      className: "gap-y-1 gap-x-1",
+      items,
+    })
+    expect(await rowGapPx(page)).toBeCloseTo(16, 0)
+    expect(await widthOf(page, "item-2")).toBeCloseTo(W(6, 600, 16), 0)
+  })
+
+  test("responsive md:gap-1 does not override gap", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 800 })
+    await loadFixture(page, {
+      containerWidth: 600,
+      gap: 4,
+      className: "md:gap-1",
+      items,
+    })
+    expect(await rowGapPx(page)).toBeCloseTo(16, 0)
+    expect(await widthOf(page, "item-2")).toBeCloseTo(W(6, 600, 16), 0)
+  })
+
+  test("col-start-3 does not override start", async ({ page }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [{ span: 2, start: 5, className: "col-start-3" }],
+    })
+    const containerLeft = await leftOf(page, "grid-container")
+    expect((await leftOf(page, "item-0")) - containerLeft).toBeCloseTo(
+      START_PX(5, 600, 32),
+      0,
+    )
   })
 })
