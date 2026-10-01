@@ -68,12 +68,13 @@ import { Grid, GridColumn } from "@/components/ui/grid"
 
 ### `<GridColumn>`
 
-| Prop      | Type                           | Default | Notes                                                                                                                                 |
-| --------- | ------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `span`    | `ResponsiveValue<GridSpan>`    | `12`    | Columns to span (1–12). Use `0` to hide at a breakpoint.                                                                              |
-| `start`   | `ResponsiveValue<GridStart>`   | `auto`  | Column line the column starts on (1–12). Wraps to the next row if it's taken; `span` is capped so it never runs past the last column. |
-| `rowSpan` | `ResponsiveValue<GridRowSpan>` | `1`     | Rows to span (1–12)                                                                                                                   |
-| `as`      | `GridElement`                  | `"div"` | Element to render                                                                                                                     |
+| Prop       | Type                            | Default | Notes                                                                                                                                 |
+| ---------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `span`     | `ResponsiveValue<GridSpan>`     | `12`    | Columns to span (1–12). Use `0` to hide at a breakpoint.                                                                              |
+| `start`    | `ResponsiveValue<GridStart>`    | `auto`  | Column line the column starts on (1–12). Wraps to the next row if it's taken; `span` is capped so it never runs past the last column. |
+| `rowSpan`  | `ResponsiveValue<GridRowSpan>`  | `1`     | Rows to span (1–12)                                                                                                                   |
+| `rowStart` | `ResponsiveValue<GridRowStart>` | `auto`  | Row line the column starts on (1–12)                                                                                                  |
+| `as`       | `GridElement`                   | `"div"` | Element to render                                                                                                                     |
 
 For visual reordering, pass Tailwind's `order-*` utilities via `className` (e.g. `className="md:order-1"`).
 
@@ -86,6 +87,7 @@ type GapScale = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12
 type GridSpan = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 type GridStart = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 type GridRowSpan = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+type GridRowStart = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 type GridElement = "div" | "section"
 ```
 
@@ -93,7 +95,7 @@ type GridElement = "div" | "section"
 
 ### Props vs `className`
 
-Gaps and column placement come from props only: `gap-*` and `col-*` classes in `className` don't apply, even when the prop is left at its default (`<Grid rowGap={4} className="gap-1">` keeps a 16px row gap). Use inline `style` if you need an escape hatch. The one exception is `row-span-*`, which overrides `rowSpan`: there's no `rowStart` prop, so the row's start edge is left to `className`.
+Gaps and column placement come from props only: `gap-*` and `col-*` classes in `className` don't apply, even when the prop is left at its default (`<Grid rowGap={4} className="gap-1">` keeps a 16px row gap). Use inline `style` if you need an escape hatch. Rows follow the same rule once `rowSpan` or `rowStart` is set: `row-*` classes are then ignored. A column with neither prop leaves its row placement to `className`.
 
 ## License
 

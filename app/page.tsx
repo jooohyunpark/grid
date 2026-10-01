@@ -323,6 +323,7 @@ type GapScale           = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12
 type GridSpan           = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 type GridStart          = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 type GridRowSpan        = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+type GridRowStart       = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 type GridElement        = "div" | "section"`}
         />
 
@@ -451,6 +452,18 @@ type GridElement        = "div" | "section"`}
                   <code>1</code>
                 </TableCell>
                 <TableCell>Rows to span (1–12)</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <code>rowStart</code>
+                </TableCell>
+                <TableCell>
+                  <code>GridRowStart</code>
+                </TableCell>
+                <TableCell>
+                  <code>auto</code>
+                </TableCell>
+                <TableCell>Row line the column starts on (1–12)</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>

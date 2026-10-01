@@ -6,6 +6,7 @@ type ItemConfig = {
   span?: ResponsiveNumber
   start?: ResponsiveNumber
   rowSpan?: ResponsiveNumber
+  rowStart?: ResponsiveNumber
   as?: string
   className?: string
   nested?: {
@@ -587,21 +588,6 @@ test.describe("Props win over className", () => {
     }
   })
 
-  test("row-end-5 does not override rowSpan", async ({ page }) => {
-    await loadFixture(page, {
-      containerWidth: 600,
-      items: [
-        { span: 6, rowSpan: 2, className: "row-end-5" },
-        { span: 6 },
-        { span: 6 },
-        { span: 6 },
-      ],
-    })
-    // Spanning 2 rows frees columns 1–6 in row 3 for item-3.
-    const containerLeft = await leftOf(page, "grid-container")
-    expect((await leftOf(page, "item-3")) - containerLeft).toBeCloseTo(0, 0)
-  })
-
   test("col-start-3 does not override start", async ({ page }) => {
     await loadFixture(page, {
       containerWidth: 600,
@@ -612,5 +598,262 @@ test.describe("Props win over className", () => {
       START_PX(5, 600, 32),
       0,
     )
+  })
+})
+
+test.describe("Row props win over row-* className", () => {
+  const FILLERS = 7
+  // Default rowGap=12 → 48px; fixture items are 40px tall.
+  const ROW = 40 + 48
+
+  // item-0 is the column under test; the fillers after it are span=6. While
+  // item-0 holds columns 1–6, each filler lands at column 7, so the run of
+  // fillers at column 7 is the number of rows item-0 actually spans.
+  const loadRowFixture = (page: Page, target: ItemConfig) =>
+    loadFixture(page, {
+      containerWidth: 600,
+      items: [
+        { span: 6, ...target },
+        ...Array.from({ length: FILLERS }, () => ({ span: 6 })),
+      ],
+    })
+
+  async function rowsSpanned(page: Page): Promise<number> {
+    const containerLeft = await leftOf(page, "grid-container")
+    const col7 = START_PX(7, 600, 32)
+    let rows = 0
+    for (let i = 1; i <= FILLERS; i++) {
+      const left = (await leftOf(page, `item-${i}`)) - containerLeft
+      if (Math.abs(left - col7) > 1) break
+      rows++
+    }
+    return rows
+  }
+
+  const rowEdges = (page: Page) =>
+    page.getByTestId("item-0").evaluate((el) => {
+      const cs = getComputedStyle(el)
+      return { start: cs.gridRowStart, end: cs.gridRowEnd }
+    })
+
+  // Class names are written out in full so Tailwind generates them.
+  const overrides = [
+    "row-span-1",
+    "row-span-3",
+    "row-span-full",
+    "row-span-[3]",
+    "row-[span_3]",
+    "row-[span_3/span_3]",
+    "row-start-[span_3]",
+    "row-end-5",
+    "row-start-3",
+    "row-start-3 row-end-5",
+    "row-3",
+    "row-auto",
+    "row-span-3 row-end-5",
+    "flex row-span-3 opacity-50",
+    "  row-span-3\n\trow-span-4  ",
+  ]
+
+  for (const className of overrides) {
+    test(`${JSON.stringify(className)} does not override rowSpan=2`, async ({
+      page,
+    }) => {
+      await loadRowFixture(page, { rowSpan: 2, className })
+      expect(await rowsSpanned(page)).toBe(2)
+      expect(await rowEdges(page)).toEqual({ start: "auto", end: "span 2" })
+    })
+  }
+
+  const responsiveOverrides = [
+    { className: "sm:row-span-3", viewport: 700 },
+    { className: "md:row-span-3", viewport: 800 },
+    { className: "lg:row-span-3", viewport: 1100 },
+    { className: "xl:row-span-3", viewport: 1300 },
+    { className: "2xl:row-span-3", viewport: 1600 },
+    { className: "max-md:row-span-3", viewport: 600 },
+    { className: "md:max-xl:row-span-3", viewport: 1100 },
+    { className: "row-span-3 md:row-span-4 xl:row-span-5", viewport: 1300 },
+  ]
+
+  for (const { className, viewport } of responsiveOverrides) {
+    test(`"${className}" does not override rowSpan=2 at viewport=${viewport}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: viewport, height: 800 })
+      await loadRowFixture(page, { rowSpan: 2, className })
+      expect(await rowsSpanned(page)).toBe(2)
+    })
+  }
+
+  test("explicit rowSpan=1 is not overridden by row-span-3", async ({
+    page,
+  }) => {
+    await loadRowFixture(page, { rowSpan: 1, className: "row-span-3" })
+    expect(await rowsSpanned(page)).toBe(1)
+  })
+
+  for (const rowSpan of [1, 2, 3, 4, 5, 6] as const) {
+    test(`rowSpan=${rowSpan} holds against row-span-7`, async ({ page }) => {
+      await loadRowFixture(page, { rowSpan, className: "row-span-7" })
+      expect(await rowsSpanned(page)).toBe(rowSpan)
+    })
+  }
+
+  test("responsive rowSpan holds against row-span-* at every breakpoint", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 600, height: 800 })
+    await loadRowFixture(page, {
+      rowSpan: { base: 1, md: 3, xl: 2 },
+      className: "row-span-4 md:row-span-5 lg:row-span-4 xl:row-span-5",
+    })
+    expect(await rowsSpanned(page)).toBe(1)
+    await page.setViewportSize({ width: 800, height: 800 })
+    expect(await rowsSpanned(page)).toBe(3)
+    await page.setViewportSize({ width: 1100, height: 800 })
+    expect(await rowsSpanned(page)).toBe(3)
+    await page.setViewportSize({ width: 1300, height: 800 })
+    expect(await rowsSpanned(page)).toBe(2)
+  })
+
+  test("rowSpan set only from md still beats row-span-3 below md", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 600, height: 800 })
+    await loadRowFixture(page, { rowSpan: { md: 2 }, className: "row-span-3" })
+    expect(await rowsSpanned(page)).toBe(1)
+    await page.setViewportSize({ width: 1024, height: 800 })
+    expect(await rowsSpanned(page)).toBe(2)
+  })
+
+  test("rowStart places the row and rowSpan spans from it", async ({
+    page,
+  }) => {
+    await loadRowFixture(page, { rowSpan: 2, rowStart: 2 })
+    expect(
+      (await topOf(page, "item-0")) - (await topOf(page, "grid-container")),
+    ).toBeCloseTo(ROW, 0)
+    expect(await rowEdges(page)).toEqual({ start: "2", end: "span 2" })
+  })
+
+  test("rowStart alone spans one row from its line", async ({ page }) => {
+    await loadRowFixture(page, { rowStart: 3 })
+    expect(
+      (await topOf(page, "item-0")) - (await topOf(page, "grid-container")),
+    ).toBeCloseTo(2 * ROW, 0)
+    expect(await rowEdges(page)).toEqual({ start: "3", end: "span 1" })
+  })
+
+  for (const className of [
+    "row-start-4",
+    "md:row-start-4",
+    "row-span-3",
+    "row-end-5",
+    "row-4",
+    "row-start-[span_3]",
+  ]) {
+    test(`"${className}" does not override rowStart=2`, async ({ page }) => {
+      await page.setViewportSize({ width: 1024, height: 800 })
+      await loadRowFixture(page, { rowStart: 2, className })
+      expect(await rowEdges(page)).toEqual({ start: "2", end: "span 1" })
+    })
+  }
+
+  for (const rowStart of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const) {
+    test(`rowStart=${rowStart} lands on row line ${rowStart}`, async ({
+      page,
+    }) => {
+      await loadRowFixture(page, { rowStart, className: "row-start-1" })
+      expect(await rowEdges(page)).toEqual({
+        start: String(rowStart),
+        end: "span 1",
+      })
+    })
+  }
+
+  test("responsive rowStart: { md: 2 } is auto below md", async ({ page }) => {
+    await page.setViewportSize({ width: 600, height: 800 })
+    await loadRowFixture(page, {
+      rowStart: { md: 2 },
+      className: "row-start-4",
+    })
+    expect(await rowEdges(page)).toEqual({ start: "auto", end: "span 1" })
+    await page.setViewportSize({ width: 1024, height: 800 })
+    expect(await rowEdges(page)).toEqual({ start: "2", end: "span 1" })
+  })
+
+  test("without row props, row-start-2 in className still applies", async ({
+    page,
+  }) => {
+    await loadRowFixture(page, { className: "row-start-2" })
+    expect(await rowEdges(page)).toMatchObject({ start: "2" })
+  })
+
+  test("nested column does not inherit an outer column's rowStart", async ({
+    page,
+  }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [{ rowStart: 3, nested: { items: [{ span: 6, rowSpan: 1 }] } }],
+    })
+    expect(
+      await page
+        .getByTestId("item-0-0")
+        .evaluate((el) => getComputedStyle(el).gridRowStart),
+    ).toBe("auto")
+  })
+
+  test("other classes next to row-span-3 are kept", async ({ page }) => {
+    await loadRowFixture(page, {
+      rowSpan: 2,
+      className: "flex row-span-3 order-1",
+    })
+    const style = await page.getByTestId("item-0").evaluate((el) => {
+      const cs = getComputedStyle(el)
+      return { display: cs.display, order: cs.order }
+    })
+    expect(style).toEqual({ display: "flex", order: "1" })
+  })
+
+  test("without rowSpan, row-span-3 in className still applies", async ({
+    page,
+  }) => {
+    await loadRowFixture(page, { className: "row-span-3" })
+    expect(await rowsSpanned(page)).toBe(3)
+  })
+
+  test("without rowSpan or className, a column spans one row", async ({
+    page,
+  }) => {
+    await loadRowFixture(page, {})
+    expect(await rowsSpanned(page)).toBe(1)
+  })
+
+  test("nested column's rowSpan holds against row-span-3 on the outer column", async ({
+    page,
+  }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      colGap: 0,
+      items: [
+        {
+          span: 12,
+          rowSpan: 1,
+          className: "row-span-3",
+          nested: {
+            colGap: 0,
+            items: [{ span: 6, rowSpan: 2 }, { span: 6 }, { span: 6 }],
+          },
+        },
+      ],
+    })
+    const innerLeft = await leftOf(page, "item-0-0")
+    expect((await leftOf(page, "item-0-2")) - innerLeft).toBeCloseTo(300, 0)
+    expect(
+      await page
+        .getByTestId("item-0")
+        .evaluate((el) => getComputedStyle(el).gridRowEnd),
+    ).toBe("span 1")
   })
 })

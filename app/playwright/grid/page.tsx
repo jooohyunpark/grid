@@ -7,6 +7,7 @@ import {
   type GridSpan,
   type GridStart,
   type GridRowSpan,
+  type GridRowStart,
   type GridElement,
   type ResponsiveValue,
 } from "@/components/ui/grid"
@@ -15,6 +16,7 @@ type ItemConfig = {
   span?: ResponsiveValue<GridSpan>
   start?: ResponsiveValue<GridStart>
   rowSpan?: ResponsiveValue<GridRowSpan>
+  rowStart?: ResponsiveValue<GridRowStart>
   as?: GridElement
   className?: string
   nested?: {
@@ -76,6 +78,7 @@ export default async function Page({
             span={item.span}
             start={item.start}
             rowSpan={item.rowSpan}
+            rowStart={item.rowStart}
             as={item.as}
             className={item.className}
             data-testid={`item-${i}`}
@@ -94,6 +97,7 @@ export default async function Page({
                     span={inner.span}
                     start={inner.start}
                     rowSpan={inner.rowSpan}
+                    rowStart={inner.rowStart}
                     data-testid={`item-${i}-${j}`}
                     style={{ height: 40, background: "#666" }}
                   />
