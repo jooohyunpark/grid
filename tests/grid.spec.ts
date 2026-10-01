@@ -556,6 +556,52 @@ test.describe("Props win over className", () => {
     expect(await widthOf(page, "item-2")).toBeCloseTo(W(6, 600, 16), 0)
   })
 
+  test("col-span-4 does not override span", async ({ page }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [{ span: 6, className: "col-span-4" }],
+    })
+    expect(await widthOf(page, "item-0")).toBeCloseTo(W(6, 600, 32), 0)
+  })
+
+  test("md:col-span-4 does not override span", async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 800 })
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [{ span: 6, className: "md:col-span-4" }],
+    })
+    expect(await widthOf(page, "item-0")).toBeCloseTo(W(6, 600, 32), 0)
+  })
+
+  test("col-span-4 and col-start-3 don't apply without props", async ({
+    page,
+  }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [{ className: "col-span-4" }, { className: "col-start-3" }],
+    })
+    const containerLeft = await leftOf(page, "grid-container")
+    for (const id of ["item-0", "item-1"]) {
+      expect((await leftOf(page, id)) - containerLeft).toBeCloseTo(0, 0)
+      expect(await widthOf(page, id)).toBeCloseTo(600, 0)
+    }
+  })
+
+  test("row-end-5 does not override rowSpan", async ({ page }) => {
+    await loadFixture(page, {
+      containerWidth: 600,
+      items: [
+        { span: 6, rowSpan: 2, className: "row-end-5" },
+        { span: 6 },
+        { span: 6 },
+        { span: 6 },
+      ],
+    })
+    // Spanning 2 rows frees columns 1–6 in row 3 for item-3.
+    const containerLeft = await leftOf(page, "grid-container")
+    expect((await leftOf(page, "item-3")) - containerLeft).toBeCloseTo(0, 0)
+  })
+
   test("col-start-3 does not override start", async ({ page }) => {
     await loadFixture(page, {
       containerWidth: 600,

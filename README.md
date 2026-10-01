@@ -91,6 +91,10 @@ type GridElement = "div" | "section"
 
 `base` is the unprefixed default — values apply until `sm` (640px) takes over. So `span={{ md: 6 }}` is full width on mobile, half from `md` up. When both `gap` and `rowGap`/`colGap` are set at the same breakpoint, the per-axis value wins.
 
+### Props vs `className`
+
+Gaps and column placement come from props only: `gap-*` and `col-*` classes in `className` don't apply, even when the prop is left at its default (`<Grid rowGap={4} className="gap-1">` keeps a 16px row gap). Use inline `style` if you need an escape hatch. The one exception is `row-span-*`, which overrides `rowSpan`: there's no `rowStart` prop, so the row's start edge is left to `className`.
+
 ## License
 
 MIT

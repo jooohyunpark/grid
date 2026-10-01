@@ -51,31 +51,30 @@ const DEFAULT_COL_GAP: GapScale = 8
 // The column gap is capped at 1/12 of the container: a percentage gap resolves
 // against the grid's width, so the 11 gutters can never push it past its edge.
 //
-// The gaps are arbitrary properties so twMerge never strips them for a `gap-*`
-// in className, and scoped to data-slot so the extra attribute selector
-// outranks `gap-y-*` and responsive `md:gap-*` utilities.
+// Layout comes from props only. The gap and placement declarations are
+// arbitrary properties, so twMerge never strips them for a `gap-*` or `col-*`
+// in className, and `[&&]:` doubles the class selector so they outrank any
+// single-class utility, including responsive ones like `md:gap-1`.
 const GRID_CLASS =
-  "grid grid-cols-[repeat(12,minmax(0,1fr))] data-[slot=grid]:[column-gap:min(var(--grid-col-gap),100%/12)] data-[slot=grid]:[row-gap:var(--grid-row-gap)] " +
+  "grid grid-cols-[repeat(12,minmax(0,1fr))] [&&]:[column-gap:min(var(--grid-col-gap),100%/12)] [&&]:[row-gap:var(--grid-row-gap)] " +
   "[--grid-col-gap:var(--grid-col-gap-base)] sm:[--grid-col-gap:var(--grid-col-gap-sm)] md:[--grid-col-gap:var(--grid-col-gap-md)] lg:[--grid-col-gap:var(--grid-col-gap-lg)] xl:[--grid-col-gap:var(--grid-col-gap-xl)] 2xl:[--grid-col-gap:var(--grid-col-gap-2xl)] " +
   "[--grid-row-gap:var(--grid-row-gap-base)] sm:[--grid-row-gap:var(--grid-row-gap-sm)] md:[--grid-row-gap:var(--grid-row-gap-md)] lg:[--grid-row-gap:var(--grid-row-gap-lg)] xl:[--grid-row-gap:var(--grid-row-gap-xl)] 2xl:[--grid-row-gap:var(--grid-row-gap-2xl)]"
 
+// Both column edges are always set (start falls back to auto), so a
+// `col-span-*` in className has no edge left to win on. Longhands on purpose:
+// the grid-column shorthand would reset the edge the other class sets.
 const COLUMN_CLASS =
   "min-w-0 " +
   "[--grid-span:var(--grid-span-base)] sm:[--grid-span:var(--grid-span-sm)] md:[--grid-span:var(--grid-span-md)] lg:[--grid-span:var(--grid-span-lg)] xl:[--grid-span:var(--grid-span-xl)] 2xl:[--grid-span:var(--grid-span-2xl)] " +
-  "[grid-column-end:span_var(--grid-span)]"
-
-// Only applied when start is set, so a nested column never picks up an outer
-// column's --grid-start. Longhands on purpose: the grid-column shorthand would
-// reset the edge the other class sets. Scoped to data-slot, like the gaps, so a
-// `col-start-*` in className can't override the prop.
-const START_CLASS =
   "[--grid-start:var(--grid-start-base)] sm:[--grid-start:var(--grid-start-sm)] md:[--grid-start:var(--grid-start-md)] lg:[--grid-start:var(--grid-start-lg)] xl:[--grid-start:var(--grid-start-xl)] 2xl:[--grid-start:var(--grid-start-2xl)] " +
-  "data-[slot=grid-column]:[grid-column-start:var(--grid-start)]"
+  "[&&]:[grid-column-start:var(--grid-start)] [&&]:[grid-column-end:span_var(--grid-span)]"
 
-// Same opt-in rule as START_CLASS, for rows.
+// Only applied when rowSpan is set, so a nested column never picks up an outer
+// column's --grid-row-span. Owns the end edge only: with no rowStart prop,
+// `row-start-*` in className is how rows get placed.
 const ROW_SPAN_CLASS =
   "[--grid-row-span:var(--grid-row-span-base)] sm:[--grid-row-span:var(--grid-row-span-sm)] md:[--grid-row-span:var(--grid-row-span-md)] lg:[--grid-row-span:var(--grid-row-span-lg)] xl:[--grid-row-span:var(--grid-row-span-xl)] 2xl:[--grid-row-span:var(--grid-row-span-2xl)] " +
-  "[grid-row-end:span_var(--grid-row-span)]"
+  "[&&]:[grid-row-end:span_var(--grid-row-span)]"
 
 // Hides only inside each flagged breakpoint's own range, so outside it the
 // column keeps whatever display its className gives it. One attribute per
@@ -172,15 +171,14 @@ function GridColumn({
 }: GridColumnProps) {
   const spans = resolve(span, DEFAULT_SPAN)
   // Breakpoints before the first set start stay auto-placed.
-  const starts = start != null && resolve<GridStart | "auto">(start, "auto")
+  const starts = resolve<GridStart | "auto">(start, "auto")
   // A span running past line 13 would add implicit columns and resize every
   // track, so cap it to the columns left after start.
   const fitted = { ...spans }
-  if (starts)
-    for (const bp of BREAKPOINTS) {
-      const s = starts[bp]
-      if (s !== "auto") fitted[bp] = Math.min(spans[bp], 13 - s) as GridSpan
-    }
+  for (const bp of BREAKPOINTS) {
+    const s = starts[bp]
+    if (s !== "auto") fitted[bp] = Math.min(spans[bp], 13 - s) as GridSpan
+  }
   const hiddenAt = BREAKPOINTS.filter((bp) => spans[bp] === 0)
   const hideAttrs = Object.fromEntries(
     hiddenAt.map((bp) => [`data-hide-${bp}`, ""]),
@@ -192,14 +190,13 @@ function GridColumn({
       {...hideAttrs}
       className={cn(
         COLUMN_CLASS,
-        starts && START_CLASS,
         rowSpan != null && ROW_SPAN_CLASS,
         hiddenAt.length > 0 && HIDE_CLASS,
         className,
       )}
       style={{
         ...responsiveVars("--grid-span", fitted),
-        ...(starts && responsiveVars("--grid-start", starts)),
+        ...responsiveVars("--grid-start", starts),
         ...(rowSpan != null &&
           responsiveVars("--grid-row-span", resolve(rowSpan, 1))),
         ...style,
