@@ -85,7 +85,6 @@ export default function Page() {
         </p>
       </Block>
 
-      {/* Installation */}
       <Block>
         <h2>Installation</h2>
         <p>Add Grid to your project via the shadcn CLI.</p>

@@ -503,8 +503,8 @@ test.describe("Nested grids", () => {
   })
 })
 
-test.describe("Responsive dedup", () => {
-  test("re-emits class when responsive value reverts to an earlier one", async ({
+test.describe("Responsive fallback", () => {
+  test("a value that reverts to an earlier one at a later breakpoint applies", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1100, height: 800 })

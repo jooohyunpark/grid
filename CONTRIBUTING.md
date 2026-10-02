@@ -22,7 +22,7 @@ All three should pass.
 ## Pull requests
 
 - Keep changes focused — one concern per PR.
-- Write a clear title and explain the *why*, not just the *what*.
+- Write a clear title and explain the _why_, not just the _what_.
 - Match the surrounding code style; don't customize shadcn primitives.
 
 ## Bugs and ideas
